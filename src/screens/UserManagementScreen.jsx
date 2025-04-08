@@ -1,116 +1,178 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Alert } from 'react-native';
-import { Card, Title, Paragraph, Button, Portal, Dialog, RadioButton, Text } from 'react-native-paper';
-import { db } from '../api/database';
+import { View, FlatList, StyleSheet, Alert } from 'react-native';
+import { Card, Title, Paragraph, ActivityIndicator, IconButton, Portal, Modal, TextInput, Button, SegmentedButtons } from 'react-native-paper';
+import { supabase } from '../api/supabase';
 
 export const UserManagementScreen = () => {
   const [users, setUsers] = useState([]);
-  const [visible, setVisible] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [selectedRole, setSelectedRole] = useState('client');
+  const [editedUsername, setEditedUsername] = useState('');
+  const [editedRole, setEditedRole] = useState('');
+
+  const loadUsers = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('usuarios')
+        .select('id, username, role, state');
+
+      if (error) throw error;
+      setUsers(data || []);
+    } catch (error) {
+      console.error('Error:', error);
+      Alert.alert('Error', 'No se pudieron cargar los usuarios');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
 
   useEffect(() => {
     loadUsers();
   }, []);
 
-  const loadUsers = async () => {
+  const handleEdit = (user) => {
+    setSelectedUser(user);
+    setEditedUsername(user.username || '');
+    setEditedRole(user.role || 'client');
+    setEditModalVisible(true);
+  };
+
+  const handleSaveEdit = async () => {
     try {
-      const data = await db.userService.getAllUsers();
-      if (data) {
-        setUsers(Array.isArray(data) ? data : Object.entries(data));
+      if (!editedUsername.trim()) {
+        Alert.alert('Error', 'El nombre de usuario es requerido');
+        return;
       }
+
+      const { error } = await supabase
+        .from('usuarios')
+        .update({
+          username: editedUsername.trim(),
+          role: editedRole
+        })
+        .eq('id', selectedUser.id);
+
+      if (error) throw error;
+
+      Alert.alert('Éxito', 'Usuario actualizado correctamente');
+      setEditModalVisible(false);
+      loadUsers();
     } catch (error) {
-      Alert.alert('Error', 'No se pudieron cargar los usuarios');
-      console.error(error);
+      console.error('Error:', error);
+      Alert.alert('Error', 'No se pudo actualizar el usuario');
     }
   };
 
-  const handleRoleChange = async () => {
+  const toggleUserState = async (userId, currentState) => {
     try {
-      const success = await db.userService.updateUser(selectedUser.id, {
-        role: selectedRole
-      });
-      
-      if (success) {
-        loadUsers();
-        setVisible(false);
-        setSelectedUser(null);
-        Alert.alert('Éxito', 'Rol actualizado correctamente');
-      }
+      const newState = currentState === 'activo' ? 'inactivo' : 'activo';
+      const { error } = await supabase
+        .from('usuarios')
+        .update({ state: newState })
+        .eq('id', userId);
+
+      if (error) throw error;
+
+      Alert.alert('Éxito', `Usuario ${newState === 'activo' ? 'activado' : 'desactivado'} correctamente`);
+      loadUsers();
     } catch (error) {
-      Alert.alert('Error', 'No se pudo actualizar el rol');
-      console.error(error);
+      console.error('Error:', error);
+      Alert.alert('Error', 'No se pudo actualizar el estado del usuario');
     }
   };
 
-  const handleDelete = async (userId) => {
-    try {
-      const success = await db.userService.deleteUser(userId);
-      if (success) {
-        loadUsers();
-        Alert.alert('Éxito', 'Usuario eliminado correctamente');
-      }
-    } catch (error) {
-      Alert.alert('Error', 'No se pudo eliminar el usuario');
-      console.error(error);
-    }
-  };
+  const renderUser = ({ item }) => (
+    <Card style={styles.card}>
+      <Card.Content>
+        <Title>{item.username || 'Sin nombre'}</Title>
+        <Paragraph>ID: {item.id || 'N/A'}</Paragraph>
+        <Paragraph>Rol: {item.role || 'N/A'}</Paragraph>
+        <View style={styles.cardActions}>
+          <Button
+            mode="contained"
+            onPress={() => toggleUserState(item.id, item.state)}
+            style={[
+              styles.stateButton,
+              { backgroundColor: item.state === 'activo' ? '#4CAF50' : '#f44336' }
+            ]}
+          >
+            {item.state === 'activo' ? 'Activo' : 'Inactivo'}
+          </Button>
+          <IconButton
+            icon="pencil"
+            onPress={() => handleEdit(item)}
+          />
+        </View>
+      </Card.Content>
+    </Card>
+  );
+
+  if (loading && !refreshing) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#0b3d93" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      <ScrollView>
-        {users.map(([id, user]) => (
-          <Card key={id} style={styles.card}>
-            <Card.Content>
-              <Title>{user.username}</Title>
-              <Paragraph>ID: {id}</Paragraph>
-              <Paragraph>Rol: {user.role}</Paragraph>
-            </Card.Content>
-            <Card.Actions>
-              <Button 
-                onPress={() => {
-                  setSelectedUser(user);
-                  setSelectedRole(user.role);
-                  setVisible(true);
-                }}
-                disabled={user.role === 'admin'}
-              >
-                Cambiar Rol
-              </Button>
-              <Button 
-                onPress={() => handleDelete(id)}
-                disabled={user.role === 'admin'}
-              >
-                Eliminar
-              </Button>
-            </Card.Actions>
-          </Card>
-        ))}
-      </ScrollView>
+      <FlatList
+        data={users}
+        renderItem={renderUser}
+        keyExtractor={(item) => item.id?.toString()}
+        contentContainerStyle={styles.listContent}
+        onRefresh={loadUsers}
+        refreshing={refreshing}
+      />
 
       <Portal>
-        <Dialog visible={visible} onDismiss={() => setVisible(false)}>
-          <Dialog.Title>Cambiar Rol de Usuario</Dialog.Title>
-          <Dialog.Content>
-            <RadioButton.Group 
-              onValueChange={value => setSelectedRole(value)} 
-              value={selectedRole}
+        <Modal
+          visible={editModalVisible}
+          onDismiss={() => setEditModalVisible(false)}
+          contentContainerStyle={styles.modalContainer}
+        >
+          <Title style={styles.modalTitle}>Editar Usuario</Title>
+
+          <TextInput
+            label="Nombre de Usuario"
+            value={editedUsername}
+            onChangeText={setEditedUsername}
+            style={styles.input}
+            mode="outlined"
+          />
+
+          <SegmentedButtons
+            value={editedRole}
+            onValueChange={setEditedRole}
+            buttons={[
+              { value: 'client', label: 'Cliente' },
+              { value: 'admin', label: 'Admin' },
+            ]}
+            style={styles.roleSelector}
+          />
+
+          <View style={styles.modalButtons}>
+            <Button
+              mode="outlined"
+              onPress={() => setEditModalVisible(false)}
+              style={styles.button}
             >
-              <View style={styles.radioOption}>
-                <RadioButton value="client" />
-                <Text>Cliente</Text>
-              </View>
-              <View style={styles.radioOption}>
-                <RadioButton value="admin" />
-                <Text>Administrador</Text>
-              </View>
-            </RadioButton.Group>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={() => setVisible(false)}>Cancelar</Button>
-            <Button onPress={handleRoleChange}>Guardar</Button>
-          </Dialog.Actions>
-        </Dialog>
+              Cancelar
+            </Button>
+            <Button
+              mode="contained"
+              onPress={handleSaveEdit}
+              style={styles.button}
+            >
+              Guardar
+            </Button>
+          </View>
+        </Modal>
       </Portal>
     </View>
   );
@@ -119,14 +181,52 @@ export const UserManagementScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    backgroundColor: '#f5f5f5',
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   card: {
-    marginBottom: 16,
+    margin: 8,
+    elevation: 4,
   },
-  radioOption: {
+  listContent: {
+    padding: 8,
+  },
+  cardActions: {
     flexDirection: 'row',
+    justifyContent: 'flex-end',
     alignItems: 'center',
-    marginVertical: 8,
+    marginTop: 10,
   },
+  stateButton: {
+    marginRight: 10,
+  },
+  modalContainer: {
+    backgroundColor: 'white',
+    padding: 20,
+    margin: 20,
+    borderRadius: 8,
+  },
+  modalTitle: {
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  input: {
+    marginBottom: 15,
+  },
+  roleSelector: {
+    marginBottom: 20,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginTop: 20,
+    gap: 10,
+  },
+  button: {
+    minWidth: 100,
+  }
 });

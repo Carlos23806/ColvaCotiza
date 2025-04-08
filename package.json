@@ -24,7 +24,10 @@
     "react-native-reanimated": "~3.16.1",
     "react-native-safe-area-context": "^4.14.1",
     "react-native-screens": "~4.4.0",
-    "expo-build-properties": "~0.13.2"
+    "expo-build-properties": "~0.13.2",
+    "react-dom": "18.3.1",
+    "react-native-web": "~0.19.13",
+    "@expo/metro-runtime": "~4.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

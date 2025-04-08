@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet, FlatList, Alert, ScrollView } from 'react-native';
-import { Card, Title, Paragraph, Button, Portal, Dialog, DataTable } from 'react-native-paper';
+import { Card, Title, Paragraph, Button, Portal, Dialog, DataTable, FAB } from 'react-native-paper';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../api/database';
 import { generatePDF, openPDF } from '../utils/pdfGenerator';
+import { colors } from '../constants/colors';
 
 export const HistorialScreen = ({ navigation }) => {
   const [cotizaciones, setCotizaciones] = useState([]);
@@ -118,7 +119,13 @@ export const HistorialScreen = ({ navigation }) => {
         </Dialog.ScrollArea>
         <Dialog.Actions>
           <Button onPress={() => setVisible(false)}>Cerrar</Button>
-          <Button onPress={() => handleDownloadPDF(selectedCotizacion)}>Descargar PDF</Button>
+          <Button 
+            mode="contained"
+            onPress={() => handleDownloadPDF(selectedCotizacion)}
+            style={[styles.button, { backgroundColor: '#0b3d93' }]}
+          >
+            Descargar PDF
+          </Button>
           <Button 
             onPress={handleOpenPDF}
             disabled={!pdfPath}
@@ -139,8 +146,21 @@ export const HistorialScreen = ({ navigation }) => {
         <Paragraph>Total: ${item.total.toFixed(2)}</Paragraph>
       </Card.Content>
       <Card.Actions>
-        <Button onPress={() => showDetalles(item)}>Ver Detalles</Button>
-        <Button onPress={() => handleDownloadPDF(item)}>Descargar PDF</Button>
+        <Button 
+          mode="outlined"
+          onPress={() => showDetalles(item)}
+          style={[styles.button, { borderColor: '#0b3d93' }]}
+          textColor="#0b3d93"
+        >
+          Ver Detalles
+        </Button>
+        <Button 
+          mode="contained"
+          onPress={() => handleDownloadPDF(item)}
+          style={[styles.button, { backgroundColor: '#0b3d93' }]}
+        >
+          Descargar PDF
+        </Button>
       </Card.Actions>
     </Card>
   );
@@ -155,6 +175,11 @@ export const HistorialScreen = ({ navigation }) => {
         onRefresh={loadCotizaciones}
       />
       {renderDetallesDialog()}
+      <FAB
+        style={[styles.fab, { backgroundColor: '#0b3d93' }]}
+        icon="plus"
+        onPress={() => navigation.navigate('Quotation')}
+      />
     </View>
   );
 
@@ -175,7 +200,18 @@ const styles = StyleSheet.create({
   totals: {
     padding: 16,
     borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
+    borderTopColor: '#e0e0ee',
     marginTop: 16,
+  },
+  button: {
+    marginVertical: 5,
+    flex: 1,
+    marginHorizontal: 5,
+  },
+  fab: {
+    position: 'absolute',
+    margin: 16,
+    right: 0,
+    bottom: 0,
   },
 });

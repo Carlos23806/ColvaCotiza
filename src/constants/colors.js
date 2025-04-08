@@ -1,23 +1,11 @@
-export const COLORS = {
-  primary: '#0b3d93',
-  primary_light: '#2d5eb8',
-  primary_dark: '#082c6b',
-  white: '#ffffff',
-  background: '#f5f7fa', // Fondo más claro
-  text: '#333333', // Texto principal más suave
-  textLight: '#666666',
-  border: '#e0e0e0',
-  success: '#4CAF50',
-  error: '#f44336',
-  warning: '#ff9800',
-  info: '#2196f3',
-  card: '#ffffff',
-  headerBackground: '#0b3d93',
-  headerText: '#ffffff',
-  buttonBackground: '#0b3d93',
-  buttonText: '#ffffff',
-  inputBackground: '#ffffff',
-  tabBar: '#ffffff',
-  tabBarActive: '#0b3d93',
-  tabBarInactive: '#666666',
+export const colors = {
+  primary: '#0b3d93',    // Azul principal
+  secondary: '#4a90e2',  // Azul secundario
+  accent: '#ffa726',     // Naranja acentuado
+  background: '#ffffff', 
+  text: '#000000',
+  error: '#ff3b30',
+  success: '#4cd964',
+  warning: '#ff9500',
+  gray: '#cccccc',
 };

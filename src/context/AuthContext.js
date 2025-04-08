@@ -5,24 +5,40 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const login = async (idNumber, password) => {
+  const login = async (numeroIdentificacion, password) => {
     try {
-      const { data: userInDB, error: dbError } = await supabase
-        .from('usuarios') // Cambiado de 'users' a 'usuarios'
-        .select()
-        .eq('id', idNumber)
+      setLoading(true);
+      
+      const { data, error } = await supabase
+        .from('usuarios')
+        .select('*')
+        .eq('id', numeroIdentificacion)
         .single();
 
-      if (dbError) throw new Error('Error al buscar usuario');
-      if (!userInDB) throw new Error('Usuario no encontrado');
-      if (userInDB.password !== password) throw new Error('Contraseña incorrecta');
+      if (error) throw error;
 
-      setUser(userInDB);
-      return userInDB;
+      if (!data) {
+        throw new Error('Usuario no encontrado');
+      }
+
+      if (data.state === 'inactivo') {
+        throw new Error('Usuario inactivo. Por favor contacte al administrador.');
+      }
+
+      if (data.password !== password) {
+        throw new Error('Contraseña incorrecta');
+      }
+
+      setUser(data);
+      return data;
+
     } catch (error) {
-      console.error('Error en login:', error.message);
-      throw new Error(error.message);
+      console.error('Error en login:', error);
+      throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -80,7 +96,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout }}>
+    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

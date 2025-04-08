@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { Card, Title, Paragraph, TextInput, Button } from 'react-native-paper';
 import { useAuth } from '../context/AuthContext';
+import { colors } from '../constants/colors';
 
 export const QuotationScreen = ({ navigation }) => {
   const [products, setProducts] = useState([]);
@@ -70,64 +71,104 @@ export const QuotationScreen = ({ navigation }) => {
     });
   };
 
+  const handleAddEnvironment = () => {
+    // Logic for adding environment
+  };
+
   return (
-    <ScrollView style={styles.container}>
-      <Title style={styles.title}>Seleccione los productos</Title>
-      
-      {products.map(product => (
-        <Card key={product.id} style={styles.card}>
-          <Card.Content>
-            <Title>{product.name}</Title>
-            <Paragraph>Precio: ${product.price}</Paragraph>
-            <TextInput
-              label="Cantidad"
-              keyboardType="numeric"
-              value={selectedProducts[product.id]?.quantity?.toString() || ''}
-              onChangeText={(text) => updateQuantity(product.id, text)}
-              style={styles.input}
-            />
-          </Card.Content>
-        </Card>
-      ))}
+    <View style={styles.container}>
+      <ScrollView style={styles.scrollContainer}>
+        {products.map(product => (
+          <View key={product.id} style={styles.environmentContainer}>
+            <Card style={styles.card}>
+              <Card.Content>
+                <View style={styles.productContainer}>
+                  <Title>{product.name}</Title>
+                  <Paragraph>Precio: ${product.price}</Paragraph>
+                  <TextInput
+                    label="Cantidad"
+                    keyboardType="numeric"
+                    value={selectedProducts[product.id]?.quantity?.toString() || ''}
+                    onChangeText={(text) => updateQuantity(product.id, text)}
+                    style={styles.input}
+                  />
+                </View>
+              </Card.Content>
+            </Card>
+          </View>
+        ))}
+        <View style={styles.addButtonContainer}>
+          <Button 
+            mode="contained"
+            onPress={handleAddEnvironment}
+            style={[styles.addButton]}
+            buttonColor="#0b3d93"
+            textColor="white"
+          >
+            Agregar Ambiente
+          </Button>
+        </View>
+      </ScrollView>
 
-      <Card style={styles.totalsCard}>
-        <Card.Content>
-          <Paragraph>Subtotal: ${totals.subtotal}</Paragraph>
-          <Paragraph>IVA (19%): ${totals.iva}</Paragraph>
-          <Title>Total: ${totals.total}</Title>
-        </Card.Content>
-      </Card>
-
-      <Button 
-        mode="contained" 
-        onPress={handleContinue}
-        style={styles.button}
-      >
-        Continuar
-      </Button>
-    </ScrollView>
+      <View style={styles.continueButtonContainer}>
+        <Button
+          mode="contained"
+          onPress={handleContinue}
+          style={[styles.continueButton]}
+          buttonColor="#0b3d93"
+          textColor="white"
+        >
+          Continuar
+        </Button>
+      </View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    backgroundColor: '#f5f5f5',
   },
-  title: {
-    marginBottom: 20,
+  scrollContainer: {
+    flex: 1,
+    paddingHorizontal: 10,
+  },
+  environmentContainer: {
+    marginBottom: 15,
   },
   card: {
-    marginBottom: 16,
+    marginBottom: 10,
+    elevation: 4,
+  },
+  productContainer: {
+    marginBottom: 12,
+    padding: 8,
+    backgroundColor: '#f9f9f9',
+    borderRadius: 8,
+  },
+  addButtonContainer: {
+    paddingVertical: 20,
+    marginBottom: 80, // Aumentado para dar más espacio
+  },
+  addButton: {
+    marginVertical: 10,
+    borderRadius: 8,
+  },
+  continueButtonContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 10,
+    backgroundColor: 'white',
+    elevation: 8,
+    marginTop: 20, // Añadido margen superior
+  },
+  continueButton: {
+    borderRadius: 8,
   },
   input: {
     marginTop: 8,
-  },
-  totalsCard: {
-    marginVertical: 16,
-    backgroundColor: '#f5f5f5',
-  },
-  button: {
-    marginVertical: 16,
   },
 });

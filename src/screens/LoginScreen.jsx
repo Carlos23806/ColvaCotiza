@@ -3,6 +3,7 @@ import { View, Image, TextInput, StyleSheet, Alert } from 'react-native';
 import { Button, Text } from 'react-native-paper';
 import { useAuth } from '../context/AuthContext';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { colors } from '../constants/colors';
 
 export const LoginScreen = ({ navigation }) => {
   const [idNumber, setIdNumber] = useState('');
@@ -35,7 +36,7 @@ export const LoginScreen = ({ navigation }) => {
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Número de Identificación</Text>
         <View style={styles.inputWrapper}>
-          <MaterialCommunityIcons name="account" size={24} color="#0b3d93" />
+          <MaterialCommunityIcons name="account" size={24} color={colors.primary} />
           <TextInput
             style={styles.input}
             value={idNumber}
@@ -49,7 +50,7 @@ export const LoginScreen = ({ navigation }) => {
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Contraseña</Text>
         <View style={styles.inputWrapper}>
-          <MaterialCommunityIcons name="lock" size={24} color="#0b3d93" />
+          <MaterialCommunityIcons name="lock" size={24} color={colors.primary} />
           <TextInput
             style={styles.input}
             value={password}
@@ -60,7 +61,7 @@ export const LoginScreen = ({ navigation }) => {
           <MaterialCommunityIcons
             name={showPassword ? "eye" : "eye-off"}
             size={24}
-            color="#0b3d93"
+            color={colors.primary}
             onPress={() => setShowPassword(!showPassword)}
           />
         </View>
@@ -68,14 +69,15 @@ export const LoginScreen = ({ navigation }) => {
 
       <Button
         mode="contained"
-        style={styles.button}
+        style={[styles.button, { backgroundColor: colors.primary }]}
+        labelStyle={{ color: colors.background }}
         onPress={handleLogin}
       >
         Ingresar
       </Button>
 
       <Text 
-        style={styles.registerLink}
+        style={[styles.registerLink, { color: colors.primary }]}
         onPress={() => navigation.navigate('Register')}
       >
         ¿No tienes una cuenta?, crear una
@@ -87,7 +89,7 @@ export const LoginScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.background,
     padding: 20,
     justifyContent: 'center',
   },
@@ -108,7 +110,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: colors.gray,
     borderRadius: 5,
     paddingHorizontal: 10,
   },
@@ -118,12 +120,13 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   button: {
-    backgroundColor: '#0b3d93',
     marginTop: 20,
+    borderRadius: 8,
+    elevation: 2,
   },
   registerLink: {
-    color: '#0b3d93',
     textAlign: 'center',
     marginTop: 20,
+    fontWeight: '600',
   },
 });
