@@ -133,6 +133,7 @@ export const RegisterScreen = ({ navigation }) => {
         mode="contained"
         style={styles.button}
         onPress={handleRegister}
+        textColor='#ffffff'
       >
         Registrarse
       </Button>

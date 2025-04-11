@@ -84,7 +84,10 @@ export const ClientFormScreen = ({ navigation, route }) => {
             `La cotización se ha guardado exitosamente.\n${pdfResult.message}`,
             [{ 
               text: 'OK',
-              onPress: () => navigation.navigate('Principal')
+              onPress: () => navigation.reset({
+                index: 0,
+                routes: [{ name: 'Main' }]
+              })
             }]
           );
         } else {
@@ -97,7 +100,10 @@ export const ClientFormScreen = ({ navigation, route }) => {
           'La cotización se guardó pero hubo un error al generar el PDF. Puede descargarlo desde el historial.',
           [{ 
             text: 'OK',
-            onPress: () => navigation.navigate('Principal')
+            onPress: () => navigation.reset({
+              index: 0,
+              routes: [{ name: 'Main' }]
+            })
           }]
         );
       }

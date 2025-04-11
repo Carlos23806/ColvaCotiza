@@ -44,7 +44,23 @@ export const HistorialScreen = ({ navigation }) => {
       
       if (result.success) {
         setPdfPath(result.filePath);
-        Alert.alert('Éxito', result.message);
+        Alert.alert(
+          'Éxito', 
+          result.message,
+          [
+            {
+              text: 'Continuar',
+              style: 'default'
+            },
+            {
+              text: 'Volver al Inicio',
+              onPress: () => navigation.reset({
+                index: 0,
+                routes: [{ name: 'Main' }]
+              })
+            }
+          ]
+        );
       } else {
         throw new Error(result.message);
       }
@@ -180,7 +196,7 @@ export const HistorialScreen = ({ navigation }) => {
       <FAB
         style={[styles.fab, { backgroundColor: '#0b3d93' }]}
         icon="plus"
-        onPress={() => navigation.navigate('Quotation')}
+        onPress={() => navigation.navigate('ProductSelection')}
       />
     </View>
   );

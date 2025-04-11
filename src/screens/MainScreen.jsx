@@ -65,14 +65,13 @@ export const MainScreen = ({ navigation }) => {
                 <Button
                   mode="outlined"
                   onPress={() => navigation.navigate(option.route)}
-                  style={styles.button}
+                  style={[styles.button, { borderColor: '#0b3d93' }]}
                   contentStyle={styles.buttonContent}
+                  labelStyle={styles.buttonLabel}
                 >
-                  <View style={styles.buttonTextContainer}>
-                    <Text style={styles.buttonTitle} numberOfLines={2} ellipsizeMode="tail">{option.title}</Text>
-                    <Text style={styles.buttonDescription} numberOfLines={3} ellipsizeMode="tail">{option.description}</Text>
-                  </View>
+                  {option.title}
                 </Button>
+                <Text style={styles.buttonDescription}>{option.description}</Text>
               </View>
             ))}
         </View>
@@ -125,40 +124,29 @@ const styles = StyleSheet.create({
   button: {
     borderRadius: 4,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
-    backgroundColor: 'transparent',
+    borderColor: '#0b3d93',
+    backgroundColor: '#ffffff',
     width: '100%',
-    minHeight: 80,
+    minHeight: 60,
+    justifyContent: 'center',
+    marginBottom: 8,
   },
   buttonContent: {
     height: 'auto',
-    alignItems: 'flex-start',
-    justifyContent: 'flex-start',
-    padding: 0,
-  },
-  buttonTextContainer: {
-    alignItems: 'flex-start',
-    width: '100%',
-    paddingVertical: 12,
+    paddingVertical: 10,
     paddingHorizontal: 16,
-    flexShrink: 1,
   },
-  buttonTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 6,
-    color: '#2d2d2d',
-    textAlign: 'left',
-    flexWrap: 'wrap',
-    width: '100%',
+  buttonLabel: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#0b3d93',
+    textAlign: 'center',
   },
   buttonDescription: {
     fontSize: 14,
     color: '#444',
-    textAlign: 'left',
-    lineHeight: 20,
-    flexWrap: 'wrap',
-    width: '100%',
+    textAlign: 'center',
+    marginTop: 4,
   },
   logoutButton: {
     position: 'absolute',
