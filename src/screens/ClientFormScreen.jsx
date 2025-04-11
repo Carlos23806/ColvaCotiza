@@ -112,12 +112,15 @@ export const ClientFormScreen = ({ navigation, route }) => {
     setShowDocTypes(false);
   };
 
+  const primaryColor = '#0b3d93';
+
   return (
     <View style={styles.container}>
       <Button
         mode="outlined"
         onPress={() => setShowDocTypes(true)}
-        style={styles.input}
+        style={{ ...styles.input, borderBlockColor: primaryColor, borderWidth: 1 }}
+        textColor={primaryColor}
       >
         {formData.tipo_documento ? 
           TIPOS_DOCUMENTO.find(t => t.value === formData.tipo_documento)?.label :
@@ -132,6 +135,7 @@ export const ClientFormScreen = ({ navigation, route }) => {
               mode="text"
               onPress={() => selectTipoDocumento(tipo)}
               style={styles.docTypeButton}
+              textColor={primaryColor}
             >
               {tipo.label}
             </Button>
@@ -150,6 +154,11 @@ export const ClientFormScreen = ({ navigation, route }) => {
         maxLength={15}
         error={!!errors.numero_documento}
         style={styles.input}
+        textColor="#000000"
+        mode="flat"
+        theme={{ colors: { primary: primaryColor, text: '#000000', placeholder: primaryColor, onSurfaceVariant: primaryColor } }}
+        underlineColor="#cccccc"
+        activeUnderlineColor={primaryColor}
       />
       <HelperText type="error" visible={!!errors.numero_documento}>
         {errors.numero_documento}
@@ -161,6 +170,11 @@ export const ClientFormScreen = ({ navigation, route }) => {
         onChangeText={(text) => setFormData({ ...formData, nombres: text })}
         error={!!errors.nombres}
         style={styles.input}
+        textColor="#000000"
+        mode="flat"
+        theme={{ colors: { primary: primaryColor, text: '#000000', placeholder: primaryColor, onSurfaceVariant: primaryColor } }}
+        underlineColor="#cccccc"
+        activeUnderlineColor={primaryColor}
       />
       <HelperText type="error" visible={!!errors.nombres}>
         {errors.nombres}
@@ -172,6 +186,11 @@ export const ClientFormScreen = ({ navigation, route }) => {
         onChangeText={(text) => setFormData({ ...formData, apellidos: text })}
         error={!!errors.apellidos}
         style={styles.input}
+        textColor="#000000"
+        mode="flat"
+        theme={{ colors: { primary: primaryColor, text: '#000000', placeholder: primaryColor, onSurfaceVariant: primaryColor } }}
+        underlineColor="#cccccc"
+        activeUnderlineColor={primaryColor}
       />
       <HelperText type="error" visible={!!errors.apellidos}>
         {errors.apellidos}
@@ -185,6 +204,11 @@ export const ClientFormScreen = ({ navigation, route }) => {
         maxLength={10}
         error={!!errors.telefono}
         style={styles.input}
+        textColor="#000000"
+        mode="flat"
+        theme={{ colors: { primary: primaryColor, text: '#000000', placeholder: primaryColor, onSurfaceVariant: primaryColor } }}
+        underlineColor="#cccccc"
+        activeUnderlineColor={primaryColor}
       />
       <HelperText type="error" visible={!!errors.telefono}>
         {errors.telefono}
@@ -197,6 +221,11 @@ export const ClientFormScreen = ({ navigation, route }) => {
         keyboardType="email-address"
         error={!!errors.email}
         style={styles.input}
+        textColor="#000000"
+        mode="flat"
+        theme={{ colors: { primary: primaryColor, text: '#000000', placeholder: primaryColor, onSurfaceVariant: primaryColor } }}
+        underlineColor="#cccccc"
+        activeUnderlineColor={primaryColor}
       />
       <HelperText type="error" visible={!!errors.email}>
         {errors.email}
@@ -205,7 +234,8 @@ export const ClientFormScreen = ({ navigation, route }) => {
       <Button 
         mode="contained" 
         onPress={handleSubmit} 
-        style={styles.button}
+        style={[styles.button, { backgroundColor: primaryColor }]}
+        textColor="#ffffff"
       >
         Generar Cotización
       </Button>
@@ -225,7 +255,6 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 20,
-    backgroundColor: "#0b3d93",
   },
   docTypeList: {
     position: 'absolute',

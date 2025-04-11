@@ -107,22 +107,23 @@ export const ProductManagementScreen = () => {
           setFormData({ nombre: '', unidades: '', costo: '' });
           setVisible(true);
         }}
-        style={styles.addButton}
+        style={[styles.addButton, { backgroundColor: '#0b3d93' }]}
+        textColor='#ffffff'
       >
         Agregar Producto
       </Button>
 
       <ScrollView>
         {products.map(product => (
-          <Card key={product.id} style={styles.card}>
+          <Card key={product.id} style={[styles.card, { backgroundColor: '#ffffff' }]}>
             <Card.Content>
-              <Title>{product.nombre}</Title>
-              <Paragraph>Unidades: {product.unidades}</Paragraph>
-              <Paragraph>Precio: ${product.costo}</Paragraph>
+              <Title style={{ color: '#000' }}>{product.nombre}</Title>
+              <Paragraph style={{ color: '#000' }}>Unidades: {product.unidades}</Paragraph>
+              <Paragraph style={{ color: '#000' }}>Precio: ${product.costo}</Paragraph>
             </Card.Content>
             <Card.Actions>
-              <Button onPress={() => handleEdit(product)}>Editar</Button>
-              <Button onPress={() => handleDelete(product.id)}>Eliminar</Button>
+              <Button style={[styles.button, { borderBlockColor: '#0b3d93', borderWidth: 1 }]} textColor='#0b3d93' onPress={() => handleEdit(product)}>Editar</Button>
+              <Button style={[styles.button, { backgroundColor: '#0b3d93' }]} textColor='#ffffff' onPress={() => handleDelete(product.id)}>Eliminar</Button>
             </Card.Actions>
           </Card>
         ))}

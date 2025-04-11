@@ -7,33 +7,43 @@ export const MainScreen = ({ navigation }) => {
   const { user, logout } = useAuth();
 
   const handleLogout = async () => {
-    await logout();
-    navigation.replace('Login');
+    try {
+      // Reset navigation first, then logout - this prevents the blank screen
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }],
+      });
+      
+      // Then do the actual logout
+      await logout();
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
   };
 
   const menuOptions = [
     {
       title: 'Nueva Cotización',
       description: 'Crear y gestionar nuevas cotizaciones para clientes',
-      route: 'ProductSelection', // Asegurarse de que esta ruta existe
+      route: 'ProductSelection',
       role: ['admin', 'client']
     },
     {
       title: 'Historial de Cotizaciones',
       description: 'Ver el historial de cotizaciones realizadas',
-      route: 'Historial', // Asegurarse de que esta ruta existe
+      route: 'Historial',
       role: ['admin', 'client']
     },
     {
       title: 'Gestionar Productos',
       description: 'Administrar el inventario y catálogo de productos',
-      route: 'ProductManagement', // Asegurarse de que esta ruta existe
+      route: 'ProductManagement',
       role: ['admin']
     },
     {
       title: 'Gestionar Usuarios',
       description: 'Administrar usuarios y sus permisos en el sistema',
-      route: 'UserManagement', // Asegurarse de que esta ruta existe
+      route: 'UserManagement',
       role: ['admin']
     }
   ];
@@ -57,11 +67,10 @@ export const MainScreen = ({ navigation }) => {
                   onPress={() => navigation.navigate(option.route)}
                   style={styles.button}
                   contentStyle={styles.buttonContent}
-                  labelStyle={styles.buttonLabel}
                 >
                   <View style={styles.buttonTextContainer}>
-                    <Text style={styles.buttonTitle}>{option.title}</Text>
-                    <Text style={styles.buttonDescription}>{option.description}</Text>
+                    <Text style={styles.buttonTitle} numberOfLines={2} ellipsizeMode="tail">{option.title}</Text>
+                    <Text style={styles.buttonDescription} numberOfLines={3} ellipsizeMode="tail">{option.description}</Text>
                   </View>
                 </Button>
               </View>
@@ -72,7 +81,7 @@ export const MainScreen = ({ navigation }) => {
       <Button 
         mode="contained"
         onPress={handleLogout}
-        style={styles.logoutButton}
+        style={[styles.logoutButton, { backgroundColor: '#0b3d93' }]}
         labelStyle={styles.logoutLabel}
       >
         Cerrar Sesión
@@ -92,6 +101,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 24,
     paddingBottom: 100,
+    flexGrow: 1,
   },
   welcome: {
     fontSize: 24,
@@ -106,24 +116,32 @@ const styles = StyleSheet.create({
   },
   menuContainer: {
     gap: 16,
+    width: '100%',
   },
   menuItem: {
     width: '100%',
+    marginBottom: 10,
   },
   button: {
     borderRadius: 4,
     borderWidth: 1,
     borderColor: '#e0e0e0',
     backgroundColor: 'transparent',
-    paddingVertical: 12,
+    width: '100%',
+    minHeight: 80,
   },
   buttonContent: {
     height: 'auto',
     alignItems: 'flex-start',
-    padding: 16,
+    justifyContent: 'flex-start',
+    padding: 0,
   },
   buttonTextContainer: {
     alignItems: 'flex-start',
+    width: '100%',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    flexShrink: 1,
   },
   buttonTitle: {
     fontSize: 18,
@@ -131,19 +149,22 @@ const styles = StyleSheet.create({
     marginBottom: 6,
     color: '#2d2d2d',
     textAlign: 'left',
+    flexWrap: 'wrap',
+    width: '100%',
   },
   buttonDescription: {
     fontSize: 14,
     color: '#444',
     textAlign: 'left',
     lineHeight: 20,
+    flexWrap: 'wrap',
+    width: '100%',
   },
   logoutButton: {
     position: 'absolute',
     bottom: 24,
     alignSelf: 'center',
     borderRadius: 4,
-    backgroundColor: '#007bff',
     paddingVertical: 8,
     width: '90%',
   },

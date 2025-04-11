@@ -4,7 +4,6 @@ import { Card, Title, Paragraph, Button, Portal, Dialog, DataTable, FAB } from '
 import { useAuth } from '../context/AuthContext';
 import { db } from '../api/database';
 import { generatePDF, openPDF } from '../utils/pdfGenerator';
-import { colors } from '../constants/colors';
 
 export const HistorialScreen = ({ navigation }) => {
   const [cotizaciones, setCotizaciones] = useState([]);
@@ -118,17 +117,19 @@ export const HistorialScreen = ({ navigation }) => {
           </ScrollView>
         </Dialog.ScrollArea>
         <Dialog.Actions>
-          <Button onPress={() => setVisible(false)}>Cerrar</Button>
+          <Button onPress={() => setVisible(false)} textColor='#0b3d93'>Cerrar</Button>
           <Button 
             mode="contained"
             onPress={() => handleDownloadPDF(selectedCotizacion)}
             style={[styles.button, { backgroundColor: '#0b3d93' }]}
+            textColor='#ffffff'
           >
             Descargar PDF
           </Button>
           <Button 
             onPress={handleOpenPDF}
             disabled={!pdfPath}
+            textColor='#4a90e2'
           >
             Abrir PDF
           </Button>
@@ -140,16 +141,16 @@ export const HistorialScreen = ({ navigation }) => {
   const renderItem = ({ item }) => (
     <Card style={styles.card}>
       <Card.Content>
-        <Title>Cotización #{item.numero_cliente}</Title>
-        <Paragraph>Fecha: {new Date(item.fecha).toLocaleDateString()}</Paragraph>
-        <Paragraph>Cliente: {item.cliente_nombres} {item.cliente_apellidos}</Paragraph>
-        <Paragraph>Total: ${item.total.toFixed(2)}</Paragraph>
+        <Title style={styles.textColor}>Cotización #{item.numero_cliente}</Title>
+        <Paragraph style={styles.textColor}>Fecha: {new Date(item.fecha).toLocaleDateString()}</Paragraph>
+        <Paragraph style={styles.textColor}>Cliente: {item.cliente_nombres} {item.cliente_apellidos}</Paragraph>
+        <Paragraph style={styles.textColor}>Total: ${item.total.toFixed(2)}</Paragraph>
       </Card.Content>
       <Card.Actions>
         <Button 
           mode="outlined"
           onPress={() => showDetalles(item)}
-          style={[styles.button, { borderColor: '#0b3d93' }]}
+          style={[styles.button, { borderColor: '#0b3d93', backgroundColor: '#ffffff' }]}
           textColor="#0b3d93"
         >
           Ver Detalles
@@ -157,7 +158,8 @@ export const HistorialScreen = ({ navigation }) => {
         <Button 
           mode="contained"
           onPress={() => handleDownloadPDF(item)}
-          style={[styles.button, { backgroundColor: '#0b3d93' }]}
+          style={[styles.buttons, { backgroundColor: '#0b3d93' }]}
+          textColor="#ffffff"
         >
           Descargar PDF
         </Button>
@@ -188,11 +190,15 @@ export const HistorialScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#ffffff',
     padding: 10,
   },
   card: {
     marginBottom: 10,
+    borderRadius: 8,
+    borderBlockColor: '#cccccc',
+    borderWidth: 1,
+    backgroundColor: '#ffffff',
   },
   dialog: {
     maxHeight: '80%',
@@ -207,6 +213,14 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     flex: 1,
     marginHorizontal: 5,
+  },
+  buttons: {
+    marginVertical: 5,
+    flex: 1,
+    marginHorizontal: 5,
+  },
+  textColor: {
+    color: '#000',
   },
   fab: {
     position: 'absolute',

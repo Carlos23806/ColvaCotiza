@@ -1,4 +1,4 @@
-package com.carlos23806.ColvaAppNuevo
+package com.colva.colvaapp
 
 import android.app.Application
 import android.content.res.Configuration

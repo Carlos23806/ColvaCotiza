@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../api/supabase';
 
 const AuthContext = createContext({});
@@ -19,6 +20,9 @@ export function AuthProvider({ children }) {
       if (dbError) throw new Error('Error al buscar usuario');
       if (!userInDB) throw new Error('Usuario no encontrado');
 
+      // Save user to AsyncStorage
+      await AsyncStorage.setItem('user', JSON.stringify(userInDB));
+      
       setUser(userInDB);
       return userInDB;
 
@@ -70,8 +74,18 @@ export function AuthProvider({ children }) {
   };
 
   // Logout
-  const logout = () => {
-    setUser(null);
+  const logout = async () => {
+    try {
+      // Clear AsyncStorage first to ensure no cached credentials remain
+      await AsyncStorage.removeItem('user');
+      
+      // Then clear user state
+      setUser(null);
+      return true;
+    } catch (error) {
+      console.error('Error in logout:', error);
+      return false;
+    }
   };
 
   return (

@@ -13,11 +13,19 @@
       "android": {
         "buildType": "apk",
         "gradleCommand": ":app:assembleRelease",
-        "withoutCredentials": true
+        "withoutCredentials": true,
+        "autoIncrement": true,
+        "image": "latest",
+        "cache": {
+          "disabled": false
+        }
       }
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "android": {
+        "buildType": "app-bundle"
+      }
     }
   },
   "submit": {

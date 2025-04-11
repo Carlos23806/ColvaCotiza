@@ -143,22 +143,37 @@ export const ProductSelectionScreen = ({ navigation }) => {
       <ScrollView>
         {environments.map(env => (
           <Card key={env.id} style={styles.environmentCard}>
-            <Card.Title title={`Ambiente ${env.id}`} />
-            <Card.Content>
+            <Card.Title 
+              title={`Ambiente ${env.id}`} 
+              titleStyle={styles.cardTitle}
+            />
+            <Card.Content style={styles.cardContent}>
+              <View style={styles.headerRow}>
+                <Text style={[styles.headerText, { flex: 2 }]}>Producto</Text>
+                <Text style={[styles.headerText, { flex: 1 }]}>Disponible</Text>
+                <Text style={[styles.headerText, { flex: 1 }]}>Cantidad</Text>
+              </View>
+              
               {products.map(product => {
                 const available = getAvailableForProduct(product.id, env.id);
                 return (
                   <View key={product.id} style={styles.productRow}>
-                    <Text>{product.nombre}</Text>
-                    <Text>Disponible: {available}</Text>
-                    {available > 0 && (
-                      <TextInput
-                        style={styles.input}
-                        keyboardType="numeric"
-                        value={env.selections[product.id] || ''}
-                        onChangeText={(text) => updateSelection(env.id, product.id, text)}
-                      />
-                    )}
+                    <Text style={[styles.productText, { flex: 2 }]}>{product.nombre}</Text>
+                    <Text style={[styles.productText, { flex: 1 }]}>{available}</Text>
+                    <View style={{ flex: 1, alignItems: 'center' }}>
+                      {available > 0 ? (
+                        <TextInput
+                          style={styles.input}
+                          textColor='#000000'
+                          keyboardType="numeric"
+                          value={env.selections[product.id] || ''}
+                          onChangeText={(text) => updateSelection(env.id, product.id, text)}
+                          theme={{ colors: { text: '#000000' } }}
+                        />
+                      ) : (
+                        <Text style={styles.unavailableText}>No disponible</Text>
+                      )}
+                    </View>
                   </View>
                 );
               })}
@@ -170,7 +185,8 @@ export const ProductSelectionScreen = ({ navigation }) => {
           <Button 
             mode="contained" 
             onPress={addEnvironment}
-            style={styles.addButton}
+            style={[styles.addButton, { backgroundColor: '#0b3d93' }]}
+            textColor='#ffffff'
           >
             Agregar Ambiente
           </Button>
@@ -180,7 +196,8 @@ export const ProductSelectionScreen = ({ navigation }) => {
       <Button
         mode="contained"
         onPress={handleContinue}
-        style={styles.continueButton} 
+        style={[styles.continueButton, { borderBlockColor: '#0b3d93', borderWidth: 1 }]}
+        textColor='#0b3d93' 
       >
         Continuar
       </Button>
@@ -192,29 +209,71 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    backgroundColor: '#ffffff',
   },
   environmentCard: {
     marginBottom: 16,
-    padding: 16,
+    backgroundColor: '#ffffff',
+    elevation: 2,
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  cardTitle: {
+    color: '#000000',
+    fontWeight: 'bold',
+  },
+  cardContent: {
+    backgroundColor: '#ffffff',
+    padding: 8,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+    backgroundColor: '#f9f9f9',
+  },
+  headerText: {
+    color: '#000000',
+    fontWeight: 'bold',
+    fontSize: 14,
+    textAlign: 'center',
   },
   productRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  productText: {
+    color: '#000000',
+    fontSize: 14,
+    textAlign: 'left',
   },
   input: {
-    width: 80,
+    width: 70,
+    height: 40,
+    backgroundColor: '#ffffff',
+    textAlign: 'center',
+    color: '#000000',
+    borderWidth: 1,
+    borderColor: '#cccccc',
+    borderRadius: 4,
+  },
+  unavailableText: {
+    color: '#999999',
+    fontSize: 12,
+    fontStyle: 'italic',
   },
   addButton: {
     marginTop: 16,
     marginBottom: 32,
   },
   continueButton: {
-    position: 'absolute',
-    bottom: 20,
-    left: 20,
-    right: 20,
-    backgroundColor: '#0b3d93',
+    backgroundColor: '#ffffff',
   },
 });

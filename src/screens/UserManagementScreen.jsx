@@ -86,25 +86,28 @@ export const UserManagementScreen = () => {
   };
 
   const renderUser = ({ item }) => (
-    <Card style={styles.card}>
+    <Card style={[styles.card, { backgroundColor: '#ffffff' }]}>
       <Card.Content>
-        <Title>{item.username || 'Sin nombre'}</Title>
-        <Paragraph>ID: {item.id || 'N/A'}</Paragraph>
-        <Paragraph>Rol: {item.role || 'N/A'}</Paragraph>
+        <Title style={{ color: '#000000' }}>{item.username || 'Sin nombre'}</Title>
+        <Paragraph style={{ color: '#000000' }}>ID: {item.id || 'N/A'}</Paragraph>
+        <Paragraph style={{ color: '#000000' }}>Rol: {item.role || 'N/A'}</Paragraph>
         <View style={styles.cardActions}>
           <Button
             mode="contained"
             onPress={() => toggleUserState(item.id, item.state)}
+            textColor='#ffffff'
             style={[
               styles.stateButton,
               { backgroundColor: item.state === 'activo' ? '#4CAF50' : '#f44336' }
-            ]}
+            ]
+          }
           >
             {item.state === 'activo' ? 'Activo' : 'Inactivo'}
           </Button>
           <IconButton
             icon="pencil"
             onPress={() => handleEdit(item)}
+            style={styles.iconButton}
           />
         </View>
       </Card.Content>
@@ -136,38 +139,77 @@ export const UserManagementScreen = () => {
           onDismiss={() => setEditModalVisible(false)}
           contentContainerStyle={styles.modalContainer}
         >
-          <Title style={styles.modalTitle}>Editar Usuario</Title>
+          <Title style={[styles.modalTitle, { color: '#0b3d93' }]}>Editar Usuario</Title>
 
           <TextInput
             label="Nombre de Usuario"
             value={editedUsername}
             onChangeText={setEditedUsername}
-            style={styles.input}
-            mode="outlined"
+            style={[styles.input, { backgroundColor: '#ffffff' }]}
+            mode="flat"
+            textColor="#000000"
+            theme={{ 
+              colors: { 
+                primary: '#0b3d93',
+                placeholder: '#0b3d93',
+                text: '#000000',
+                background: '#ffffff',
+                onSurfaceVariant: '#0b3d93'
+              } 
+            }}
+            underlineColor="#cccccc"
+            activeUnderlineColor="#0b3d93"
           />
 
           <SegmentedButtons
             value={editedRole}
             onValueChange={setEditedRole}
             buttons={[
-              { value: 'client', label: 'Cliente' },
-              { value: 'admin', label: 'Admin' },
+              { 
+                value: 'client', 
+                label: 'Cliente',
+                style: editedRole === 'client' 
+                  ? { backgroundColor: '#0b3d93' }
+                  : { backgroundColor: '#ffffff', borderColor: '#0b3d93', borderWidth: 1 },
+                labelStyle: editedRole === 'client'
+                  ? { color: '#ffffff' }
+                  : { color: '#0b3d93' }
+              },
+              { 
+                value: 'admin', 
+                label: 'Admin',
+                style: editedRole === 'admin' 
+                  ? { backgroundColor: '#0b3d93' } 
+                  : { backgroundColor: '#ffffff', borderColor: '#0b3d93', borderWidth: 1 },
+                labelStyle: editedRole === 'admin'
+                  ? { color: '#ffffff' }
+                  : { color: '#0b3d93' }
+              },
             ]}
             style={styles.roleSelector}
+            theme={{ 
+              colors: { 
+                secondaryContainer: '#0b3d93',
+                onSecondaryContainer: '#ffffff',
+                outline: '#0b3d93',
+              } 
+            }}
           />
 
           <View style={styles.modalButtons}>
             <Button
               mode="outlined"
               onPress={() => setEditModalVisible(false)}
-              style={styles.button}
+              style={[styles.button, { borderColor: '#0b3d93' }]}
+              textColor="#0b3d93"
             >
               Cancelar
             </Button>
             <Button
               mode="contained"
               onPress={handleSaveEdit}
-              style={styles.button}
+              style={[styles.button, { backgroundColor: '#0b3d93' }]}
+              textColor="#ffffff"
             >
               Guardar
             </Button>
@@ -228,5 +270,13 @@ const styles = StyleSheet.create({
   },
   button: {
     minWidth: 100,
-  }
+  },
+  iconButton: {
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    backgroundColor: '#ffffff',
+  },
 });

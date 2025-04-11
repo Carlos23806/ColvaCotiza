@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "ColvaApp-Nuevo",
-    "slug": "colvaapp-nuevo-unique",
+    "name": "ColvaApp",
+    "slug": "colva-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -15,36 +15,20 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.colva.app"
     },
     "android": {
+      "package": "com.colva.colvaapp",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/images/logo_colvatel.jpg",
         "backgroundColor": "#ffffff"
-      },
-      "package": "com.carlos23806.ColvaAppNuevo"
+      }
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
-    "plugins": [
-      [
-        "expo-build-properties",
-        {
-          "android": {
-            "newArchEnabled": true
-          },
-          "ios": {
-            "newArchEnabled": true
-          }
-        }
-      ]
-    ],
     "extra": {
       "eas": {
         "projectId": "8246f9ae-1348-4577-9636-fc4d11fc6235"
       }
-    },
-    "owner": "carlos23806"
+    }
   }
 }

@@ -21,7 +21,7 @@ extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
   }
 }
 
-rootProject.name = 'ColvaAppNuevo'
+rootProject.name = 'ColvaApp'
 
 dependencyResolutionManagement {
   versionCatalogs {
