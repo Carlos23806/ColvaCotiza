@@ -12,13 +12,7 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk",
-        "gradleCommand": ":app:assembleRelease",
-        "withoutCredentials": true,
-        "autoIncrement": true,
-        "image": "latest",
-        "cache": {
-          "disabled": false
-        }
+        "gradleCommand": ":app:assembleRelease"
       }
     },
     "production": {

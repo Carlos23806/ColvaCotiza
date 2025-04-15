@@ -1,13 +1,13 @@
 {
   "expo": {
-    "name": "ColvaApp",
-    "slug": "colva-app",
+    "name": "ColvaApp-Nuevo",
+    "slug": "ColvaApp-Nuevo",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/images/logo_colvatel.jpg",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/images/logo_colvatel.jpg",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -16,19 +16,39 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.colva.app"
+      "bundleIdentifier": "com.colvatel.cotizador"
     },
     "android": {
-      "package": "com.colva.colvaapp",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/logo_colvatel.jpg",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "ACCESS_MEDIA_LOCATION"
+      ],
+      "package": "com.colvatel.cotizador"
+    },
+    "web": {
+      "favicon": "./assets/images/logo_colvatel.jpg"
     },
     "extra": {
       "eas": {
         "projectId": "8246f9ae-1348-4577-9636-fc4d11fc6235"
       }
-    }
+    },
+    "plugins": [
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "La aplicación necesita acceso a tus archivos para guardar los PDFs.",
+          "savePhotosPermission": "La aplicación necesita permiso para guardar PDFs en tu dispositivo.",
+          "isAccessMediaLocationEnabled": true
+        }
+      ]
+    ],
+    "newArchEnabled": true,
+    "entryPoint": "./index.js"
   }
 }

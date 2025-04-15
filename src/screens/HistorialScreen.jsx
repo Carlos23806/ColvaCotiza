@@ -3,15 +3,27 @@ import { View, StyleSheet, FlatList, Alert, ScrollView } from 'react-native';
 import { Card, Title, Paragraph, Button, Portal, Dialog, DataTable, FAB } from 'react-native-paper';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../api/database';
-import { generatePDF, openPDF } from '../utils/pdfGenerator';
+import { generatePDF, downloadPDF, sharePDF } from '../utils/pdfGenerator';
+import { useNotification } from '../context/NotificationContext';
+import { usePDF } from '../context/PDFContext';
+
+const formatCurrency = (value) => {
+  return new Intl.NumberFormat('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(value);
+};
 
 export const HistorialScreen = ({ navigation }) => {
   const [cotizaciones, setCotizaciones] = useState([]);
   const [selectedCotizacion, setSelectedCotizacion] = useState(null);
   const [detalles, setDetalles] = useState([]);
   const [visible, setVisible] = useState(false);
-  const [pdfPath, setPdfPath] = useState(null);
   const { user } = useAuth();
+  const { notify } = useNotification();
+  const { downloadedPDFs, addDownloadedPDF, removeDownloadedPDF } = usePDF();
 
   const loadCotizaciones = useCallback(async () => {
     if (!user?.id) {
@@ -39,49 +51,65 @@ export const HistorialScreen = ({ navigation }) => {
 
   const handleDownloadPDF = async (cotizacion) => {
     try {
+      notify({
+        message: 'Generando PDF...',
+        type: 'info',
+        duration: 2000
+      });
+
       const detallesCotizacion = await db.getCotizacionDetalles(cotizacion.id);
-      const result = await generatePDF(cotizacion, detallesCotizacion);
+      const pdfResult = await generatePDF(cotizacion, detallesCotizacion);
       
-      if (result.success) {
-        setPdfPath(result.filePath);
-        Alert.alert(
-          'Éxito', 
-          result.message,
-          [
-            {
-              text: 'Continuar',
-              style: 'default'
-            },
-            {
-              text: 'Volver al Inicio',
-              onPress: () => navigation.reset({
-                index: 0,
-                routes: [{ name: 'Main' }]
-              })
-            }
-          ]
-        );
+      if (pdfResult.success) {
+        addDownloadedPDF(cotizacion.id, pdfResult.filePath);
+        notify({
+          message: '¡PDF descargado!',
+          description: 'El archivo se ha guardado en la carpeta de Descargas',
+          type: 'success',
+          duration: 4000
+        });
       } else {
-        throw new Error(result.message);
+        throw new Error(pdfResult.message);
       }
     } catch (error) {
-      console.error('Error al generar PDF:', error);
-      Alert.alert('Error', error.message || 'No se pudo generar el PDF');
+      console.error('Error al descargar PDF:', error);
+      notify({
+        message: 'Error al descargar',
+        description: error.message || 'Verifica los permisos de almacenamiento',
+        type: 'danger',
+        duration: 4000
+      });
     }
   };
 
-  const handleOpenPDF = async () => {
-    if (!pdfPath) {
-      Alert.alert('Error', 'Primero debe generar el PDF');
-      return;
-    }
+  const handleOpenPDF = async (cotizacion) => {
     try {
-      const opened = await openPDF(pdfPath);
-      if (!opened) {
-        throw new Error('No se pudo abrir el PDF');
+      notify({
+        message: 'Generando PDF...',
+        type: 'info',
+        duration: 2000
+      });
+
+      const detallesCotizacion = await db.getCotizacionDetalles(cotizacion.id);
+      const pdfResult = await generatePDF(cotizacion, detallesCotizacion);
+      
+      if (pdfResult.success) {
+        notify({
+          message: 'PDF generado exitosamente',
+          type: 'success',
+          duration: 3000
+        });
+      } else {
+        throw new Error(pdfResult.message);
       }
     } catch (error) {
-      Alert.alert('Error', 'No se pudo abrir el PDF');
+      console.error('Error al generar PDF:', error);
+      notify({
+        message: 'Error al generar PDF',
+        description: error.message || 'No se pudo generar el archivo',
+        type: 'danger',
+        duration: 4000
+      });
     }
   };
 
@@ -120,15 +148,15 @@ export const HistorialScreen = ({ navigation }) => {
                   <DataTable.Cell>{detalle.ambiente}</DataTable.Cell>
                   <DataTable.Cell>{detalle.productos?.nombre}</DataTable.Cell>
                   <DataTable.Cell numeric>{detalle.cantidad}</DataTable.Cell>
-                  <DataTable.Cell numeric>${detalle.precio_unitario}</DataTable.Cell>
+                  <DataTable.Cell numeric>{formatCurrency(detalle.precio_unitario)}</DataTable.Cell>
                 </DataTable.Row>
               ))}
             </DataTable>
 
             <View style={styles.totals}>
-              <Paragraph>Subtotal: ${selectedCotizacion?.subtotal.toFixed(2)}</Paragraph>
-              <Paragraph>IVA: ${selectedCotizacion?.iva.toFixed(2)}</Paragraph>
-              <Title>Total: ${selectedCotizacion?.total.toFixed(2)}</Title>
+              <Paragraph>Subtotal: {formatCurrency(selectedCotizacion?.subtotal)}</Paragraph>
+              <Paragraph>IVA: {formatCurrency(selectedCotizacion?.iva)}</Paragraph>
+              <Title>Total: {formatCurrency(selectedCotizacion?.total)}</Title>
             </View>
           </ScrollView>
         </Dialog.ScrollArea>
@@ -136,16 +164,9 @@ export const HistorialScreen = ({ navigation }) => {
           <Button onPress={() => setVisible(false)} textColor='#0b3d93'>Cerrar</Button>
           <Button 
             mode="contained"
-            onPress={() => handleDownloadPDF(selectedCotizacion)}
+            onPress={() => handleOpenPDF(selectedCotizacion)}
             style={[styles.button, { backgroundColor: '#0b3d93' }]}
             textColor='#ffffff'
-          >
-            Descargar PDF
-          </Button>
-          <Button 
-            onPress={handleOpenPDF}
-            disabled={!pdfPath}
-            textColor='#4a90e2'
           >
             Abrir PDF
           </Button>
@@ -160,7 +181,7 @@ export const HistorialScreen = ({ navigation }) => {
         <Title style={styles.textColor}>Cotización #{item.numero_cliente}</Title>
         <Paragraph style={styles.textColor}>Fecha: {new Date(item.fecha).toLocaleDateString()}</Paragraph>
         <Paragraph style={styles.textColor}>Cliente: {item.cliente_nombres} {item.cliente_apellidos}</Paragraph>
-        <Paragraph style={styles.textColor}>Total: ${item.total.toFixed(2)}</Paragraph>
+        <Paragraph style={styles.textColor}>Total: {formatCurrency(item.total)}</Paragraph>
       </Card.Content>
       <Card.Actions>
         <Button 
@@ -173,11 +194,11 @@ export const HistorialScreen = ({ navigation }) => {
         </Button>
         <Button 
           mode="contained"
-          onPress={() => handleDownloadPDF(item)}
+          onPress={() => handleOpenPDF(item)}
           style={[styles.buttons, { backgroundColor: '#0b3d93' }]}
           textColor="#ffffff"
         >
-          Descargar PDF
+          Abrir PDF
         </Button>
       </Card.Actions>
     </Card>
@@ -196,6 +217,7 @@ export const HistorialScreen = ({ navigation }) => {
       <FAB
         style={[styles.fab, { backgroundColor: '#0b3d93' }]}
         icon="plus"
+        color='#ffffff'
         onPress={() => navigation.navigate('ProductSelection')}
       />
     </View>

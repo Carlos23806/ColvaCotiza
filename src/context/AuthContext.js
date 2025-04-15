@@ -11,32 +11,31 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       
+      if (!numeroIdentificacion || !password) {
+        throw new Error('Por favor ingresa todos los campos');
+      }
+
       const { data, error } = await supabase
         .from('usuarios')
         .select('*')
         .eq('id', numeroIdentificacion)
+        .eq('password', password)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error de Supabase:', error);
+        throw new Error('Error al verificar credenciales');
+      }
 
       if (!data) {
         throw new Error('Usuario no encontrado');
       }
 
-      if (data.state === 'inactivo') {
-        throw new Error('Usuario inactivo. Por favor contacte al administrador.');
-      }
-
-      if (data.password !== password) {
-        throw new Error('Contraseña incorrecta');
-      }
-
       setUser(data);
       return data;
-
     } catch (error) {
       console.error('Error en login:', error);
-      throw error;
+      throw new Error('Credenciales incorrectas, por favor verifica tus datos.');
     } finally {
       setLoading(false);
     }
@@ -44,9 +43,8 @@ export const AuthProvider = ({ children }) => {
 
   const register = async ({ id, username, password, role }) => {
     try {
-      // Primero verificamos si el usuario ya existe
       const { data: existingUser, error: checkError } = await supabase
-        .from('usuarios') // Cambiado de 'users' a 'usuarios'
+        .from('usuarios')
         .select('id')
         .eq('id', id)
         .single();
@@ -60,15 +58,14 @@ export const AuthProvider = ({ children }) => {
         throw new Error('Este número de identificación ya está registrado');
       }
 
-      // Si no existe, creamos el nuevo usuario
       const { data, error } = await supabase
-        .from('usuarios') // Cambiado de 'users' a 'usuarios'
+        .from('usuarios')
         .insert([
           { 
-            id: parseInt(id), // Aseguramos que el ID sea numérico
-            username: username.trim(), 
-            password, 
-            role: role || 'client' 
+            id: parseInt(id),
+            username: username.trim(),
+            password,
+            role: role || 'client'
           }
         ])
         .select()
@@ -85,7 +82,7 @@ export const AuthProvider = ({ children }) => {
       return data;
     } catch (error) {
       console.error('Complete registration error:', error);
-      throw error; // Propagamos el error con el mensaje detallado
+      throw error;
     }
   };
 

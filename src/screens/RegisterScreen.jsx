@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Image, TextInput, StyleSheet, Alert } from 'react-native';
+import { View, Image, TextInput, StyleSheet } from 'react-native';
 import { Button, Text } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
+import { useNotification } from '../context/NotificationContext';
 
 export const RegisterScreen = ({ navigation }) => {
   const [idNumber, setIdNumber] = useState('');
@@ -12,46 +13,46 @@ export const RegisterScreen = ({ navigation }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { register } = useAuth();
+  const { notify } = useNotification();
 
   const handleRegister = async () => {
     try {
       if (!idNumber || !username || !password || !confirmPassword) {
-        Alert.alert('Error', 'Por favor complete todos los campos');
+        notify({ message: 'Por favor complete todos los campos', type: 'warning' });
         return;
       }
 
       if (password !== confirmPassword) {
-        Alert.alert('Error', 'Las contraseñas no coinciden');
+        notify({ message: 'Las contraseñas no coinciden', type: 'warning' });
         return;
       }
 
-      // Validar que el ID sea numérico
       if (!/^\d+$/.test(idNumber)) {
-        Alert.alert('Error', 'El número de identificación debe contener solo números');
+        notify({ message: 'El número de identificación debe contener solo números', type: 'warning' });
         return;
       }
 
-      // Validar longitud mínima de contraseña
       if (password.length < 6) {
-        Alert.alert('Error', 'La contraseña debe tener al menos 6 caracteres');
+        notify({ message: 'La contraseña debe tener al menos 6 caracteres', type: 'warning' });
         return;
       }
 
       await register({
         id: idNumber,
         username: username.trim(),
-        password,
+        password: password, // Using plain password for now
         role: 'client',
       });
 
-      Alert.alert(
-        'Éxito', 
-        'Usuario registrado correctamente',
-        [{ text: 'OK', onPress: () => navigation.navigate('Login') }] // Asegurarse de que 'Login' está definido en AppNavigator
-      );
+      notify({ message: 'Usuario registrado correctamente', type: 'success' });
+      navigation.navigate('Login');
     } catch (error) {
       console.error('Error en pantalla de registro:', error);
-      Alert.alert('Error de registro', error.message || 'Error al crear el usuario');
+      notify({ 
+        message: 'Error de registro', 
+        description: error.message || 'Error al crear el usuario', 
+        type: 'danger' 
+      });
     }
   };
 
@@ -61,7 +62,7 @@ export const RegisterScreen = ({ navigation }) => {
         source={require('../../assets/images/logo_colvatel.jpg')}
         style={styles.logo}
       />
-      
+
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Número de Identificación</Text>
         <View style={styles.inputWrapper}>
@@ -138,7 +139,7 @@ export const RegisterScreen = ({ navigation }) => {
         Registrarse
       </Button>
 
-      <Text 
+      <Text
         style={styles.loginLink}
         onPress={() => navigation.navigate('Login')}
       >

@@ -1,27 +1,48 @@
 import React, { useState } from 'react';
-import { View, Image, TextInput, StyleSheet, Alert } from 'react-native';
+import { View, Image, TextInput, StyleSheet } from 'react-native';
 import { Button, Text } from 'react-native-paper';
 import { useAuth } from '../context/AuthContext';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useNotification } from '../context/NotificationContext';
+import { validateId, validatePassword } from '../utils/validations';
 
 export const LoginScreen = ({ navigation }) => {
   const [idNumber, setIdNumber] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
+  const { notify } = useNotification();
 
   const handleLogin = async () => {
     try {
-      const userData = await login(idNumber, password);
-      if (userData) {
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'Main' }], // Asegurarse de que 'Main' está definido en AppNavigator
-        });
+      const idError = validateId(idNumber);
+      if (idError) {
+        notify({ message: 'Error de validación', description: idError, type: 'warning' });
+        return;
       }
+
+      const passwordError = validatePassword(password);
+      if (passwordError) {
+        notify({ message: 'Error de validación', description: passwordError, type: 'warning' });
+        return;
+      }
+
+      await login(idNumber, password);
+      notify({ 
+        message: '¡Bienvenido!', 
+        description: 'Has iniciado sesión correctamente',
+        type: 'success' 
+      });
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Main' }],
+      });
     } catch (error) {
-      const errorMessage = error?.message || 'Ocurrió un error inesperado. Por favor, inténtalo de nuevo.';
-      Alert.alert('Error de inicio de sesión', errorMessage);
+      notify({ 
+        message: 'Error de inicio de sesión', 
+        description: error.message, 
+        type: 'danger',
+      });
     }
   };
 
@@ -79,7 +100,7 @@ export const LoginScreen = ({ navigation }) => {
         style={[styles.registerLink, { color: '#0b3d93' }]}
         onPress={() => navigation.navigate('Register')}
       >
-        ¿No tienes una cuenta?, crear una
+        ¿No tienes una cuenta?, Registrate
       </Text>
     </View>
   );

@@ -3,6 +3,15 @@ import { View, StyleSheet, ScrollView, Alert } from 'react-native';
 import { Card, Title, Paragraph, Button, TextInput, Portal, Dialog } from 'react-native-paper';
 import { supabase } from '../api/supabase';
 
+const formatCurrency = (value) => {
+  return new Intl.NumberFormat('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(value);
+};
+
 export const ProductManagementScreen = () => {
   const [products, setProducts] = useState([]);
   const [visible, setVisible] = useState(false);
@@ -98,6 +107,20 @@ export const ProductManagementScreen = () => {
     }
   };
 
+  const renderItem = ({ item }) => (
+    <Card key={item.id} style={[styles.card, { backgroundColor: '#ffffff' }]}>
+      <Card.Content>
+        <Title style={{ color: '#0b3d93' }}>{item.nombre}</Title>
+        <Paragraph style={{ color: '#000000' }}>Unidades: {item.unidades}</Paragraph>
+        <Paragraph style={{ color: '#000000' }}>Precio: {formatCurrency(item.costo)}</Paragraph>
+      </Card.Content>
+      <Card.Actions>
+        <Button style={[styles.button, { borderBlockColor: '#0b3d93', borderWidth: 1 }]} textColor='#0b3d93' onPress={() => handleEdit(item)}>Editar</Button>
+        <Button style={[styles.button, { backgroundColor: '#0b3d93' }]} textColor='#ffffff' onPress={() => handleDelete(item.id)}>Eliminar</Button>
+      </Card.Actions>
+    </Card>
+  );
+
   return (
     <View style={styles.container}>
       <Button 
@@ -114,19 +137,7 @@ export const ProductManagementScreen = () => {
       </Button>
 
       <ScrollView>
-        {products.map(product => (
-          <Card key={product.id} style={[styles.card, { backgroundColor: '#ffffff' }]}>
-            <Card.Content>
-              <Title style={{ color: '#000' }}>{product.nombre}</Title>
-              <Paragraph style={{ color: '#000' }}>Unidades: {product.unidades}</Paragraph>
-              <Paragraph style={{ color: '#000' }}>Precio: ${product.costo}</Paragraph>
-            </Card.Content>
-            <Card.Actions>
-              <Button style={[styles.button, { borderBlockColor: '#0b3d93', borderWidth: 1 }]} textColor='#0b3d93' onPress={() => handleEdit(product)}>Editar</Button>
-              <Button style={[styles.button, { backgroundColor: '#0b3d93' }]} textColor='#ffffff' onPress={() => handleDelete(product.id)}>Eliminar</Button>
-            </Card.Actions>
-          </Card>
-        ))}
+        {products.map(product => renderItem({ item: product }))}
       </ScrollView>
 
       <Portal>

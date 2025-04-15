@@ -88,7 +88,7 @@ export const UserManagementScreen = () => {
   const renderUser = ({ item }) => (
     <Card style={[styles.card, { backgroundColor: '#ffffff' }]}>
       <Card.Content>
-        <Title style={{ color: '#000000' }}>{item.username || 'Sin nombre'}</Title>
+        <Title style={{ color: '#0b3d93', fontWeight: 'bold' }}>{item.username || 'Sin nombre'}</Title>
         <Paragraph style={{ color: '#000000' }}>ID: {item.id || 'N/A'}</Paragraph>
         <Paragraph style={{ color: '#000000' }}>Rol: {item.role || 'N/A'}</Paragraph>
         <View style={styles.cardActions}>
